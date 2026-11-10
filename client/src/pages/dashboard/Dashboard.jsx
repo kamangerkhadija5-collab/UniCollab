@@ -76,8 +76,10 @@ function Dashboard() {
             Find teammates, manage your projects, and collaborate with students.
           </p>
 
-          <Link
-            to="/students"
+          {/* <Link
+            to="/students" */}
+            <Link
+            to="/find-students"
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 active:scale-[0.98]"
           >
             <Search size={17} />

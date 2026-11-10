@@ -18,7 +18,7 @@ import {
 
 const menuItems = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { name: 'Find Students', path: '/students', icon: Search },
+  { name: 'Find Students', path: '/find-students', icon: Search },
   { name: 'My Teams', path: '/teams', icon: Users },
   { name: 'Projects', path: '/projects', icon: FolderKanban },
   { name: 'Messages', path: '/chat', icon: MessageCircle }
