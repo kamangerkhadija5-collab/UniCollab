@@ -38,7 +38,12 @@ function ProtectedRoute({ children }) {
   }, [])
 
   if (status === 'loading') {
-    return <div className="p-10 text-center">Verifying login...</div>
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50 text-slate-500">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+        <p className="text-sm font-medium">Verifying login...</p>
+      </div>
+    )
   }
 
   if (status === 'unauthenticated') {

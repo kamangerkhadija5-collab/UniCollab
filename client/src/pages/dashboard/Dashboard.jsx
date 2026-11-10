@@ -1,436 +1,205 @@
-
-
-
-
-
-import { useNavigate } from 'react-router-dom'
-import { NavLink } from 'react-router-dom'
-
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
-  LayoutDashboard,
   Users,
   FolderKanban,
-  MessageCircle,
-  Search,
-  Bell,
-  UserRound,
-  Settings,
-  LogOut,
   CheckCircle,
   CalendarDays,
-  Clock
+  Clock,
+  Search,
+  ArrowRight,
+  ChevronRight
 } from 'lucide-react'
+import AppLayout from '../../components/layout/AppLayout'
+import TeamIllustration from '../../components/common/TeamIllustration'
+
+// Small count-up animation for the overview numbers (display only)
+function CountUp({ to }) {
+  const [value, setValue] = useState(0)
+
+  useEffect(() => {
+    let current = 0
+    const timer = setInterval(() => {
+      current += 1
+      setValue(current)
+      if (current >= to) clearInterval(timer)
+    }, 90)
+    return () => clearInterval(timer)
+  }, [to])
+
+  return <>{value}</>
+}
+
+const cardClass =
+  'rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/5'
 
 function Dashboard() {
-
   const user = JSON.parse(localStorage.getItem('user') || 'null')
+  const firstName = (user?.fullName || 'Student').split(' ')[0]
 
-const navigate = useNavigate()
+  // lets the progress bars animate from 0 on first paint
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setReady(true), 100)
+    return () => clearTimeout(t)
+  }, [])
 
-const handleLogout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
+  const stats = [
+    { label: 'My Teams', value: 2, note: 'Teams joined', icon: Users, tile: 'bg-blue-50 text-blue-600' },
+    { label: 'Active Projects', value: 3, note: 'Projects in progress', icon: FolderKanban, tile: 'bg-violet-50 text-violet-600' },
+    { label: 'Pending Tasks', value: 5, note: 'Tasks to complete', icon: Clock, tile: 'bg-amber-50 text-amber-600' },
+    { label: 'Completed Tasks', value: 8, note: 'Tasks completed', icon: CheckCircle, tile: 'bg-emerald-50 text-emerald-600' }
+  ]
 
-  navigate('/login', { replace: true })
-}
-  const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Find Students', path: '/students', icon: Search },
-    { name: 'My Teams', path: '/teams', icon: Users },
-    { name: 'Projects', path: '/projects', icon: FolderKanban },
-    { name: 'Messages', path: '/chat', icon: MessageCircle },
+  const projects = [
+    { name: 'UniCollab Platform', team: 'Team Alpha', progress: 75, bar: 'from-blue-500 to-blue-600', badge: 'bg-blue-50 text-blue-600', tile: 'bg-blue-50 text-blue-600' },
+    { name: 'AI Image Recognition', team: 'Team Innovators', progress: 45, bar: 'from-violet-500 to-violet-600', badge: 'bg-violet-50 text-violet-600', tile: 'bg-violet-50 text-violet-600' },
+    { name: 'Student Portal', team: 'Team Alpha', progress: 90, bar: 'from-emerald-500 to-emerald-600', badge: 'bg-emerald-50 text-emerald-600', tile: 'bg-emerald-50 text-emerald-600' }
+  ]
+
+  const tasks = [
+    { title: 'Complete UI Design', due: 'Due: November 10, 2026', month: 'NOV', day: '10', level: 'High', badge: 'bg-red-50 text-red-600 ring-red-100', date: 'bg-red-50 text-red-600' },
+    { title: 'Prepare Project Report', due: 'Due: November 12, 2026', month: 'NOV', day: '12', level: 'Medium', badge: 'bg-yellow-50 text-yellow-700 ring-yellow-100', date: 'bg-amber-50 text-amber-600' },
+    { title: 'Review Backend APIs', due: 'Due: November 15, 2026', month: 'NOV', day: '15', level: 'Low', badge: 'bg-emerald-50 text-emerald-700 ring-emerald-100', date: 'bg-emerald-50 text-emerald-600' }
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <AppLayout title="Dashboard">
+      {/* Welcome banner */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-white via-blue-50 to-blue-100 p-6 shadow-sm ring-1 ring-blue-100 sm:p-10">
+        <div className="relative z-10 max-w-xl">
+          <p className="text-sm font-semibold text-blue-600">Welcome back, {firstName}</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#0B1B3F] sm:text-4xl">
+            Welcome to <span className="text-blue-600">UniCollab!</span>
+          </h1>
+          <p className="mt-3 text-slate-600">
+            Find teammates, manage your projects, and collaborate with students.
+          </p>
 
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#101B35] text-white flex flex-col p-6">
-
-        {/* Logo */}
-        <h1 className="text-2xl font-bold mb-10">
-          UniCollab
-        </h1>
-
-        <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">
-          Main Menu
-        </p>
-
-        {/* Navigation */}
-        <nav className="space-y-2">
-
-          {menuItems.map((item) => {
-            const Icon = item.icon
-
-            return (
-              <NavLink
-                key={item.name}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-                    isActive
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-white/10'
-                  }`
-                }
-              >
-                <Icon size={20} />
-                <span>{item.name}</span>
-              </NavLink>
-            )
-          })}
-
-        </nav>
-
-        {/* Sidebar Bottom */}
-        <div className="mt-auto space-y-2">
-
-          <button className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl w-full">
-            <Settings size={20} />
-            Settings
-          </button>
-
-          <button className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/10 rounded-xl w-full" onClick={handleLogout}>
-            <LogOut size={20} />
-            Logout
-          </button>
+          <Link
+            to="/students"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 active:scale-[0.98]"
+          >
+            <Search size={17} />
+            Find teammates
+            <ArrowRight size={16} />
+          </Link>
         </div>
 
-      </aside>
+        <TeamIllustration className="pointer-events-none absolute -right-6 bottom-0 hidden h-[110%] md:block lg:right-4" />
+      </section>
 
-      {/* Main Content */}
-      <main className="flex-1 min-w-0">
+      {/* Overview Cards */}
+      <section className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((s) => {
+          const Icon = s.icon
 
-        {/* Top Navbar */}
-        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8">
-
-          <div>
-            <h2 className="text-xl font-semibold text-[#101B35]">
-              Dashboard
-            </h2>
-
-            <p className="text-sm text-gray-500">
-              Manage your university collaboration.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-5">
-
-            <button className="text-gray-500 hover:text-blue-600">
-              <Bell size={22} />
-            </button>
-
-            <div className="flex items-center gap-3">
-
-              <div className="bg-blue-100 text-blue-600 p-2 rounded-full">
-                <UserRound size={22} />
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold text-gray-800">
-                  {user?.fullName || 'Student'}
-                </p>
-
-                <p className="text-xs text-gray-500">
-                  University Member
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-
-        </header>
-
-        {/* Dashboard Overview */}
-        <section className="p-8">
-
-          {/* Welcome Section */}
-          <div className="mb-8">
-
-            <h1 className="text-2xl font-bold text-[#101B35]">
-              Welcome to UniCollab!
-            </h1>
-
-            <p className="text-gray-500 mt-2">
-              Find teammates, manage your projects, and collaborate with students.
-            </p>
-
-          </div>
-
-          {/* Overview Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-
-            {/* My Teams */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between">
-                <p className="text-gray-500 text-sm">My Teams</p>
-                <Users className="text-blue-600" size={24} />
-              </div>
-
-              <h2 className="text-3xl font-bold text-[#101B35] mt-4">
-                2
-              </h2>
-
-              <p className="text-sm text-gray-400 mt-2">
-                Teams joined
-              </p>
-            </div>
-
-            {/* Active Projects */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between">
-                <p className="text-gray-500 text-sm">Active Projects</p>
-                <FolderKanban className="text-purple-600" size={24} />
-              </div>
-
-              <h2 className="text-3xl font-bold text-[#101B35] mt-4">
-                3
-              </h2>
-
-              <p className="text-sm text-gray-400 mt-2">
-                Projects in progress
-              </p>
-            </div>
-
-            {/* Pending Tasks */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between">
-                <p className="text-gray-500 text-sm">Pending Tasks</p>
-                <Clock className="text-orange-500" size={24} />
-              </div>
-
-              <h2 className="text-3xl font-bold text-[#101B35] mt-4">
-                5
-              </h2>
-
-              <p className="text-sm text-gray-400 mt-2">
-                Tasks to complete
-              </p>
-            </div>
-
-            {/* Completed Tasks */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between">
-                <p className="text-gray-500 text-sm">Completed Tasks</p>
-                <CheckCircle className="text-green-600" size={24} />
-              </div>
-
-              <h2 className="text-3xl font-bold text-[#101B35] mt-4">
-                8
-              </h2>
-
-              <p className="text-sm text-gray-400 mt-2">
-                Tasks completed
-              </p>
-            </div>
-
-          </div>
-
-          {/* Recent Projects & Upcoming Tasks */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
-
-            {/* Recent Projects */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-
-              <div className="flex items-center justify-between mb-6">
-
+          return (
+            <div key={s.label} className={`${cardClass} p-5`}>
+              <div className="flex items-center gap-4">
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${s.tile}`}>
+                  <Icon size={24} />
+                </div>
                 <div>
-                  <h2 className="text-lg font-bold text-[#101B35]">
-                    Recent Projects
+                  <p className="text-sm font-medium text-slate-500">{s.label}</p>
+                  <h2 className="text-3xl font-bold tracking-tight text-[#0B1B3F]">
+                    <CountUp to={s.value} />
                   </h2>
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    Your team's latest projects
-                  </p>
                 </div>
-
-                <FolderKanban className="text-blue-600" size={23} />
-
               </div>
+              <p className="mt-3 text-sm text-slate-400">{s.note}</p>
+            </div>
+          )
+        })}
+      </section>
 
-              <div className="space-y-6">
-
-                {/* Project 1 */}
-                <div>
-
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h3 className="font-semibold text-gray-800">
-                        UniCollab Platform
-                      </h3>
-
-                      <p className="text-xs text-gray-500 mt-1">
-                        Team Alpha
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-semibold text-blue-600">
-                      75%
-                    </span>
-                  </div>
-
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full w-[75%]" />
-                  </div>
-
-                </div>
-
-                {/* Project 2 */}
-                <div>
-
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h3 className="font-semibold text-gray-800">
-                        AI Image Recognition
-                      </h3>
-
-                      <p className="text-xs text-gray-500 mt-1">
-                        Team Innovators
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-semibold text-purple-600">
-                      45%
-                    </span>
-                  </div>
-
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div className="bg-purple-600 h-2 rounded-full w-[45%]" />
-                  </div>
-
-                </div>
-
-                {/* Project 3 */}
-                <div>
-
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h3 className="font-semibold text-gray-800">
-                        Student Portal
-                      </h3>
-
-                      <p className="text-xs text-gray-500 mt-1">
-                        Team Alpha
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-semibold text-green-600">
-                      90%
-                    </span>
-                  </div>
-
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div className="bg-green-600 h-2 rounded-full w-[90%]" />
-                  </div>
-
-                </div>
-
-              </div>
-
+      {/* Recent Projects & Upcoming Tasks */}
+      <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {/* Recent Projects */}
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-[#0B1B3F]">Recent Projects</h2>
+              <p className="mt-0.5 text-sm text-slate-500">Your team's latest projects</p>
             </div>
 
-            {/* Upcoming Tasks */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-
-              <div className="flex items-center justify-between mb-6">
-
-                <div>
-                  <h2 className="text-lg font-bold text-[#101B35]">
-                    Upcoming Tasks
-                  </h2>
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    Tasks that need your attention
-                  </p>
-                </div>
-
-                <CalendarDays className="text-blue-600" size={23} />
-
-              </div>
-
-              <div className="space-y-4">
-
-                {/* Task 1 */}
-                <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-4">
-
-                  <div className="flex items-start gap-3">
-                    <Clock size={19} className="text-orange-500 mt-1" />
-
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-800">
-                        Complete UI Design
-                      </h3>
-
-                      <p className="text-xs text-gray-500 mt-1">
-                        Due: November 10, 2026
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className="text-xs font-medium text-red-600 bg-red-50 px-3 py-1 rounded-full">
-                    High
-                  </span>
-
-                </div>
-
-                {/* Task 2 */}
-                <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-4">
-
-                  <div className="flex items-start gap-3">
-                    <Clock size={19} className="text-orange-500 mt-1" />
-
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-800">
-                        Prepare Project Report
-                      </h3>
-
-                      <p className="text-xs text-gray-500 mt-1">
-                        Due: November 12, 2026
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className="text-xs font-medium text-yellow-700 bg-yellow-50 px-3 py-1 rounded-full">
-                    Medium
-                  </span>
-
-                </div>
-
-                {/* Task 3 */}
-                <div className="flex items-center justify-between gap-3">
-
-                  <div className="flex items-start gap-3">
-                    <Clock size={19} className="text-orange-500 mt-1" />
-
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-800">
-                        Review Backend APIs
-                      </h3>
-
-                      <p className="text-xs text-gray-500 mt-1">
-                        Due: November 15, 2026
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
-                    Low
-                  </span>
-
-                </div>
-
-              </div>
-
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <FolderKanban size={20} />
             </div>
-
           </div>
 
-        </section>
+          <div className="space-y-3">
+            {projects.map((p) => (
+              <div
+                key={p.name}
+                className="group rounded-xl border border-slate-100 p-4 transition hover:border-blue-200 hover:bg-blue-50/30"
+              >
+                <div className="mb-3 flex items-center gap-3">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${p.tile}`}>
+                    <FolderKanban size={19} />
+                  </div>
 
-      </main>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate font-semibold text-slate-800">{p.name}</h3>
+                    <p className="text-xs text-slate-500">{p.team}</p>
+                  </div>
 
-    </div>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${p.badge}`}>
+                    {p.progress}%
+                  </span>
+                </div>
+
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-2 rounded-full bg-gradient-to-r ${p.bar} transition-all duration-1000 ease-out`}
+                    style={{ width: ready ? `${p.progress}%` : '0%' }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Upcoming Tasks */}
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-[#0B1B3F]">Upcoming Tasks</h2>
+              <p className="mt-0.5 text-sm text-slate-500">Tasks that need your attention</p>
+            </div>
+
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <CalendarDays size={20} />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {tasks.map((t) => (
+              <div
+                key={t.title}
+                className="group flex items-center gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-blue-200 hover:bg-blue-50/30"
+              >
+                <div className={`flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl ${t.date}`}>
+                  <span className="text-[10px] font-bold leading-none">{t.month}</span>
+                  <span className="text-lg font-bold leading-tight">{t.day}</span>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-sm font-semibold text-slate-800">{t.title}</h3>
+                  <p className="mt-0.5 text-xs text-slate-500">{t.due}</p>
+                </div>
+
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${t.badge}`}>
+                  {t.level}
+                </span>
+
+                <ChevronRight size={18} className="hidden text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-500 sm:block" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </AppLayout>
   )
 }
 
