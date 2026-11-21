@@ -21,7 +21,9 @@ const menuItems = [
   { name: 'Find Students', path: '/find-students', icon: Search },
   { name: 'My Teams', path: '/teams', icon: Users },
   { name: 'Projects', path: '/projects', icon: FolderKanban },
-  { name: 'Messages', path: '/chat', icon: MessageCircle }
+  { name: 'Messages', path: '/chat', icon: MessageCircle },
+  { label: 'Kanban Board', path: '/tasks' }
+  
 ]
 
 // Shared shell (sidebar + top bar) used by every logged-in page.

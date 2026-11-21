@@ -7,6 +7,12 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import Profile from './pages/profile/Profile'
 import FindStudents from './pages/teams/FindStudents'
 import StudentProfile from './pages/profile/StudentProfile'
+import CreateTeam from './pages/teams/CreateTeam'
+import Teams from './pages/teams/Teams'
+import TeamRequests from './pages/teams/TeamRequests'
+import Projects from './pages/projects/Projects'
+import TaskBoard from './pages/projects/TaskBoard'
+
 function App() {
   return (
     <Routes>
@@ -51,6 +57,53 @@ function App() {
   element={
     <ProtectedRoute>
       <StudentProfile />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/teams/create"
+  element={
+    <ProtectedRoute>
+      <CreateTeam />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/teams"
+  element={
+    <ProtectedRoute>
+      <Teams />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/teams/requests"
+  element={
+    <ProtectedRoute>
+      <TeamRequests />
+    </ProtectedRoute>
+  }
+/>
+
+
+<Route
+  path="/projects"
+  element={
+    <ProtectedRoute>
+      <Projects />
+    </ProtectedRoute>
+  }
+/>
+
+
+<Route
+  path="/tasks"
+  element={
+    <ProtectedRoute>
+      <TaskBoard />
     </ProtectedRoute>
   }
 />

@@ -1,5 +1,5 @@
 const dns = require('node:dns')
-
+const teamRoutes = require('./routes/teamRoutes')
 dns.setServers(['8.8.8.8', '1.1.1.1'])
 
 require('dotenv').config()
@@ -13,12 +13,20 @@ const authRoutes = require('./routes/authRoutes')
 const studentRoutes = require('./routes/studentRoutes')
 const app = express()
 
+const projectRoutes = require('./routes/projectRoutes')
+
+const taskRoutes = require('./routes/taskRoutes')
+
+
 // Middleware
 app.use(cors())
 app.use(express.json())
 
 app.use('/api/auth', authRoutes)
 app.use('/api/students', studentRoutes)
+app.use('/api/projects', projectRoutes)
+app.use('/api/teams', teamRoutes)
+app.use('/api/tasks', taskRoutes)
 
 // Test route
 app.get('/api/health', (req, res) => {
