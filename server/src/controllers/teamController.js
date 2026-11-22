@@ -1,11 +1,9 @@
-
 const Team = require('../models/Team')
 
 const createTeam = async (req, res) => {
   try {
     const { name, description, requiredSkills } = req.body
 
-    // Check required field
     if (!name || !name.trim()) {
       return res.status(400).json({
         success: false,
@@ -13,16 +11,11 @@ const createTeam = async (req, res) => {
       })
     }
 
-    // Create team
     const team = await Team.create({
       name: name.trim(),
-      description,
-      requiredSkills: requiredSkills || [],
-
-      // Logged-in student becomes leader
+      description: description ? description.trim() : '',
+      requiredSkills: Array.isArray(requiredSkills) ? requiredSkills : [],
       leader: req.user.id,
-
-      // Add leader as first member
       members: [
         {
           user: req.user.id,
@@ -36,7 +29,6 @@ const createTeam = async (req, res) => {
       message: 'Team created successfully',
       team
     })
-
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -44,7 +36,6 @@ const createTeam = async (req, res) => {
     })
   }
 }
-
 
 const getTeams = async (req, res) => {
   try {
@@ -53,12 +44,27 @@ const getTeams = async (req, res) => {
       .populate('members.user', 'fullName department')
       .sort({ createdAt: -1 })
 
-    res.status(200).json({
-      success: true,
-      count: teams.length,
-      teams
+    // Enhance team list with member & request status for the logged-in user
+    const formattedTeams = teams.map((team) => {
+      const teamObj = team.toObject()
+      const userId = req.user?.id || req.user?._id
+
+      teamObj.isLeader = team.leader?._id?.toString() === userId?.toString()
+      teamObj.isMember = team.members.some(
+        (m) => m.user?._id?.toString() === userId?.toString()
+      )
+      teamObj.hasPendingRequest = team.joinRequests.some(
+        (r) => r.user?.toString() === userId?.toString() && r.status === 'pending'
+      )
+
+      return teamObj
     })
 
+    res.status(200).json({
+      success: true,
+      count: formattedTeams.length,
+      teams: formattedTeams
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -66,9 +72,11 @@ const getTeams = async (req, res) => {
     })
   }
 }
+
 const requestToJoinTeam = async (req, res) => {
   try {
     const { id } = req.params
+    const userId = req.user.id || req.user._id
 
     const team = await Team.findById(id)
 
@@ -80,7 +88,7 @@ const requestToJoinTeam = async (req, res) => {
     }
 
     const alreadyMember = team.members.some(
-      member => member.user.toString() === req.user.id
+      (member) => member.user.toString() === userId.toString()
     )
 
     if (alreadyMember) {
@@ -91,21 +99,21 @@ const requestToJoinTeam = async (req, res) => {
     }
 
     const existingRequest = team.joinRequests.find(
-      request =>
-        request.user.toString() === req.user.id &&
+      (request) =>
+        request.user.toString() === userId.toString() &&
         request.status === 'pending'
     )
 
     if (existingRequest) {
       return res.status(400).json({
         success: false,
-        message: 'You already have a pending request'
+        message: 'You already have a pending request for this team'
       })
     }
 
     team.joinRequests.push({
-      user: req.user.id,
-      message: req.body.message || ''
+      user: userId,
+      message: req.body.message || 'Requesting to join the team.'
     })
 
     await team.save()
@@ -124,8 +132,11 @@ const requestToJoinTeam = async (req, res) => {
 
 const getJoinRequests = async (req, res) => {
   try {
-    const team = await Team.findById(req.params.id)
-      .populate('joinRequests.user', 'fullName email department')
+    const userId = req.user.id || req.user._id
+    const team = await Team.findById(req.params.id).populate(
+      'joinRequests.user',
+      'fullName email department semester'
+    )
 
     if (!team) {
       return res.status(404).json({
@@ -134,7 +145,7 @@ const getJoinRequests = async (req, res) => {
       })
     }
 
-    if (team.leader.toString() !== req.user.id) {
+    if (team.leader.toString() !== userId.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Only the team leader can view join requests'
@@ -144,7 +155,7 @@ const getJoinRequests = async (req, res) => {
     res.status(200).json({
       success: true,
       requests: team.joinRequests.filter(
-        request => request.status === 'pending'
+        (request) => request.status === 'pending'
       )
     })
   } catch (error) {
@@ -159,11 +170,12 @@ const handleJoinRequest = async (req, res) => {
   try {
     const { id, requestId } = req.params
     const { action } = req.body
+    const userId = req.user.id || req.user._id
 
     if (!['accept', 'reject'].includes(action)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid action'
+        message: 'Invalid action. Action must be accept or reject.'
       })
     }
 
@@ -176,7 +188,7 @@ const handleJoinRequest = async (req, res) => {
       })
     }
 
-    if (team.leader.toString() !== req.user.id) {
+    if (team.leader.toString() !== userId.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Only the team leader can manage requests'
@@ -218,8 +230,12 @@ const handleJoinRequest = async (req, res) => {
 
 const getMyTeams = async (req, res) => {
   try {
-    const teams = await Team.find({ leader: req.user.id })
-      .select('name description')
+    const userId = req.user.id || req.user._id
+    const teams = await Team.find({
+      $or: [{ leader: userId }, { 'members.user': userId }]
+    })
+      .select('name description leader members requiredSkills')
+      .populate('leader', 'fullName')
 
     res.status(200).json({
       success: true,
@@ -241,4 +257,3 @@ module.exports = {
   handleJoinRequest,
   getMyTeams
 }
-
