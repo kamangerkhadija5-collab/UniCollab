@@ -13,7 +13,8 @@ import {
   X,
   GraduationCap,
   ChevronDown,
-  UserRound
+  UserRound,
+  KanbanSquare
 } from 'lucide-react'
 
 const menuItems = [
@@ -22,8 +23,7 @@ const menuItems = [
   { name: 'My Teams', path: '/teams', icon: Users },
   { name: 'Projects', path: '/projects', icon: FolderKanban },
   { name: 'Messages', path: '/chat', icon: MessageCircle },
-  { label: 'Kanban Board', path: '/tasks' }
-  
+  { name: 'Kanban Board', path: '/tasks', icon: KanbanSquare }
 ]
 
 // Shared shell (sidebar + top bar) used by every logged-in page.
@@ -114,12 +114,16 @@ function AppLayout({ title, children }) {
 
         {/* Sidebar bottom */}
         <div className="space-y-1 px-3 pb-4">
-          <button className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900">
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+          >
             <Settings size={19} className="text-slate-400" />
             Settings
           </button>
 
           <button
+            type="button"
             className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
             onClick={handleLogout}
           >
