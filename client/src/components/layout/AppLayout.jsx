@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import {
@@ -26,8 +27,6 @@ const menuItems = [
   { name: 'Kanban Board', path: '/tasks', icon: KanbanSquare }
 ]
 
-// Shared shell (sidebar + top bar) used by every logged-in page.
-// Usage: <AppLayout title="Dashboard"> ...page content... </AppLayout>
 function AppLayout({ title, children }) {
   const [open, setOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -39,13 +38,11 @@ function AppLayout({ title, children }) {
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-
     navigate('/login', { replace: true })
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f2f7ff] via-white to-[#eef3ff] text-slate-900">
-      {/* Mobile overlay */}
       {open && (
         <div
           className="fixed inset-0 z-30 bg-slate-900/30 backdrop-blur-sm lg:hidden"
@@ -53,19 +50,19 @@ function AppLayout({ title, children }) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200/70 bg-white transition-transform duration-200 lg:translate-x-0 ${
           open ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
-        {/* Logo */}
         <div className="flex h-16 items-center justify-between px-5">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-600/25">
               <GraduationCap size={20} />
             </div>
-            <span className="text-lg font-bold tracking-tight text-[#0B1B3F]">UniCollab</span>
+            <span className="text-lg font-bold tracking-tight text-[#0B1B3F]">
+              UniCollab
+            </span>
           </div>
 
           <button
@@ -78,7 +75,6 @@ function AppLayout({ title, children }) {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <div className="space-y-1">
             {menuItems.map((item) => {
@@ -101,7 +97,11 @@ function AppLayout({ title, children }) {
                     <>
                       <Icon
                         size={19}
-                        className={isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'}
+                        className={
+                          isActive
+                            ? 'text-blue-600'
+                            : 'text-slate-400 group-hover:text-slate-600'
+                        }
                       />
                       <span>{item.name}</span>
                     </>
@@ -112,7 +112,6 @@ function AppLayout({ title, children }) {
           </div>
         </nav>
 
-        {/* Sidebar bottom */}
         <div className="space-y-1 px-3 pb-4">
           <button
             type="button"
@@ -143,9 +142,7 @@ function AppLayout({ title, children }) {
         </div>
       </aside>
 
-      {/* Main */}
       <div className="lg:pl-64">
-        {/* Top bar */}
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200/60 bg-white/80 px-4 backdrop-blur-md sm:px-8">
           <div className="flex items-center gap-3">
             <button
@@ -174,7 +171,6 @@ function AppLayout({ title, children }) {
               <Bell size={20} />
             </button>
 
-            {/* User menu */}
             <div className="relative">
               <button
                 type="button"
@@ -186,26 +182,33 @@ function AppLayout({ title, children }) {
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-bold text-white">
                   {initial}
                 </div>
+
                 <div className="hidden text-left sm:block">
                   <p className="text-sm font-semibold leading-tight text-slate-800">
                     {user?.fullName || 'Student'}
                   </p>
                   <p className="text-xs text-slate-500">University Member</p>
                 </div>
+
                 <ChevronDown
                   size={16}
-                  className={`hidden text-slate-400 transition sm:block ${menuOpen ? 'rotate-180' : ''}`}
+                  className={`hidden text-slate-400 transition sm:block ${
+                    menuOpen ? 'rotate-180' : ''
+                  }`}
                 />
               </button>
 
               {menuOpen && (
                 <>
-                  <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
+                  <div
+                    className="fixed inset-0 z-30"
+                    onClick={() => setMenuOpen(false)}
+                  />
+
                   <div
                     role="menu"
                     className="absolute right-0 z-40 mt-2 w-52 overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-900/5"
                   >
-                    {/* Change '/profile' if your profile route has a different path */}
                     <Link
                       to="/profile"
                       onClick={() => setMenuOpen(false)}
@@ -214,6 +217,7 @@ function AppLayout({ title, children }) {
                       <UserRound size={18} className="text-slate-400" />
                       My Profile
                     </Link>
+
                     <button
                       type="button"
                       onClick={handleLogout}
@@ -229,7 +233,9 @@ function AppLayout({ title, children }) {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-8">{children}</main>
+        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-8">
+          {children}
+        </main>
       </div>
     </div>
   )

@@ -12,8 +12,9 @@ import Teams from './pages/teams/Teams'
 import TeamRequests from './pages/teams/TeamRequests'
 import Projects from './pages/projects/Projects'
 import TaskBoard from './pages/projects/TaskBoard'
+import Chat from './pages/chat/Chat'
 
-function App() {
+export function App() {
   return (
     <Routes>
 
@@ -108,10 +109,20 @@ function App() {
   }
 />
 
+
+<Route
+  path="/chat"
+  element={
+    <ProtectedRoute>
+      <Chat />
+    </ProtectedRoute>
+  }
+/>
+
     </Routes>
 
     
   )
 }
 
-export default App
+// export default App
